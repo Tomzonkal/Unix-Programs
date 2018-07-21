@@ -1,0 +1,122 @@
+#include <string>
+#include <sstream>
+#include <set>
+#include <stdio.h>
+#include <iostream>
+#include <fcntl.h>
+#include <unistd.h>
+#include <errno.h>
+#include <dirent.h>
+#include <sys/stat.h>
+#include <sys/types.h>
+#define dl 1024
+using namespace std;
+int main(int argc,char **argv)
+{
+ DIR* sciezka;
+ struct dirent *spis;
+ set<string> pliki;
+ int f1,d;
+ char tresc[100000];
+ extern int errno;
+
+ f1=open(argv[1],O_WRONLY|O_CREAT|O_EXCL,S_IRUSR|S_IWUSR);
+
+ if(f1==-1)
+ {
+  switch(errno)
+  {
+  case EFAULT:
+  cout<<"Nie podano nazwy pliku\n";
+  return 0;
+
+  case EACCES:
+  cout<<"Nie masz uprawien \n";
+  return 0;
+ default:
+  cout<<"Inny blad";
+  return 0;
+  }
+ }
+
+ else
+ {
+
+
+  if( (sciezka=opendir(argv[2] )))
+  {
+   while(( spis=readdir(sciezka)))
+  pliki.insert(spis->d_name);
+
+   closedir(sciezka);
+  }
+
+  else
+
+   switch(errno)
+   {
+   case EMFILE:
+   cout<<"Osiagnieto limit otwartyc katalogow\n";
+   return 0;
+
+   case EACCES:
+   cout<<"Nie masz uprawien \n";
+   return 0;
+
+   case ENOTDIR:
+ cout<<"nazwa nie jest katalogiem\n";
+   return 0;
+
+   default:
+   cout<<"Inny blad";
+   return 0;
+   }
+
+ }
+ std::ostringstream stream;
+ std::copy(pliki.begin(), pliki.end(),
+ std::ostream_iterator<std::string>(stream, "\n"));
+ std::string result = stream.str();
+
+ char tab[result.size()+1];
+
+ strcpy(tab,result.c_str());
+ write(f1,tab,result.size()+1);
+ close(f1);
+
+ d=open(argv[1], O_RDONLY);
+
+ if(d==-1)
+ {
+  switch(errno)
+  {
+  case EFAULT:
+  cout<<"Nie podano nazwy pliku\n";
+  return 0;
+
+  case EACCES:
+  cout<<"Nie masz uprawien \n";
+  return 0;
+
+  case EMFILE:
+cout<<"Osiagnieto limit otwartych plikow\n";
+  return 0;
+
+  default:
+  cout<<"Inny blad";
+  return 0;
+  }
+ }
+
+ else
+{
+ read(d,tresc,10000);
+ cout <<tresc;
+ close(d);
+}
+
+return 0;
+
+}
+
+

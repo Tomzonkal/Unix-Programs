@@ -1,0 +1,86 @@
+#define _GNU_SOURCE
+#include <stdlib.h>
+#include <stdio.h>
+#include <pthread.h>
+#include <errno.h>
+#include <sys/types.h>
+#include <cmath>
+#include <sstream>
+#include <string>
+#include <cstdlib>
+#include<stdlib.h>
+#include<stdio.h>
+#include<unistd.h>
+double sinus(double  ac[])
+{
+ac[1]=sin(ac[0]);
+std::stringstream ss;
+ss << pthread_self();
+long  idn = pthread_self();
+sleep(idn);
+cout<<"jestem sinus moj wynik to "<<ac[1]<<endl;
+return 0;
+}
+
+
+
+intptr_t logar(double  ac[])
+{
+
+
+ac[2] = log10(ac[0]);
+
+std::stringstream ss;
+ss << pthread_self();
+long  idn = pthread_self();
+
+sleep(idn);
+
+cout<<"jestem logarytm moj wynik to "<<ac[2]<<endl;
+return 0;
+}
+intptr_t pot(double ac[])
+{
+
+
+std::stringstream ss;
+ss << pthread_self();
+long  idn = pthread_self();
+
+ac[3]= ac[0]*ac[0];
+
+sleep(idn);
+
+cout<<"jestem potega moj wynik to "<<ac[3]<<endl;
+return 0;
+}
+
+
+
+int main(int argc, char *argv[])
+{
+if(argc<2){cout<<"brak argumentu"<<endl;return 0;}
+
+double  x ( atof(argv[1]));
+if(x<=0){cout<<"liczba jest niedodatnia"<<endl;return 0;}
+double tab[4];
+tab[0]=x;
+pthread_t thread1,thread2,thread3;
+
+
+pthread_create(&thread1, NULL,(void*(*)(void*))logar,tab);
+pthread_create(&thread2, NULL,(void*(*)(void*))sinus,tab);
+pthread_create(&thread3, NULL,(void*(*)(void*))pot, tab);
+pthread_join( thread1, NULL);
+pthread_join( thread2, NULL);
+pthread_join( thread3, NULL);
+
+
+cout<<"\n";
+double suma=tab[1]+tab[2]+tab[3];
+cout<<"suma wynosi "<<suma<<endl;
+
+return 0;
+}
+
+
